@@ -4,11 +4,21 @@ const NodeWebcam = require("node-webcam");
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+const COOLDOWN_MS = 20_000;
+let lastPhotoTime = 0;
+
 const mainKeyboard = Markup.keyboard([['📷 Парковка']]).resize().persistent();
 
 bot.start((ctx) => ctx.reply('Привет!', mainKeyboard));
 
 bot.hears('📷 Парковка', async (ctx) => {
+  const elapsed = Date.now() - lastPhotoTime;
+  if (elapsed < COOLDOWN_MS) {
+    const wait = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
+    await ctx.reply(`Подожди ещё ${wait} сек.`);
+    return;
+  }
+  lastPhotoTime = Date.now();
   await ctx.reply('Делаю снимок...');
   try {
     await getParkingPhoto();
