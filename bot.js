@@ -4,14 +4,11 @@ const NodeWebcam = require("node-webcam");
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-bot.start((ctx) =>
-  ctx.reply('Нажми кнопку чтобы посмотреть парковку', Markup.inlineKeyboard([
-    Markup.button.callback('📷 Парковка', 'parking_photo')
-  ]))
-);
+const mainKeyboard = Markup.keyboard([['📷 Парковка']]).resize().persistent();
 
-bot.action('parking_photo', async (ctx) => {
-  await ctx.answerCbQuery();
+bot.start((ctx) => ctx.reply('Привет!', mainKeyboard));
+
+bot.hears('📷 Парковка', async (ctx) => {
   await ctx.reply('Делаю снимок...');
   try {
     await getParkingPhoto();
